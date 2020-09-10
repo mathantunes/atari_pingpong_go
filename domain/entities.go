@@ -22,12 +22,31 @@ func (b *Ball) Draw(pixels []byte) {
 func (b *Ball) Update() {
 	b.pos.x += b.vel.x
 	b.pos.y += b.vel.y
-	b.tryBounce()
-
+	b.tryBounceOffLimits()
 }
-func (b *Ball) tryBounce() {
-	if b.pos.y < 0 || b.pos.y > 600 {
+
+func (b *Ball) Bounce(pLeft *Paddle, pRigth *Paddle) {
+
+	if int(b.pos.x)-b.radius < int(pLeft.pos.x)+pLeft.size.w/2 {
+		if int(b.pos.y) > int(pLeft.pos.y)-pLeft.size.h/2 && int(b.pos.y) < int(pLeft.pos.y)+pLeft.size.h/2 {
+			b.vel.x *= -1
+		}
+	}
+	if int(b.pos.x)+b.radius > int(pRigth.pos.x)-pRigth.size.w/2 {
+		if int(b.pos.y) > int(pRigth.pos.y)-pRigth.size.h/2 && int(b.pos.y) < int(pRigth.pos.y)+pRigth.size.h/2 {
+			b.vel.x *= -1
+		}
+	}
+}
+
+func (b *Ball) tryBounceOffLimits() {
+	fRadius := float32(b.radius)
+	if b.pos.y-fRadius < 0 || b.pos.y+fRadius > 600 {
 		b.vel.y *= -1
+	}
+	if b.pos.x-fRadius < 0 || b.pos.x+fRadius > 800 {
+		b.pos.x = 300
+		b.pos.y = 300
 	}
 }
 
@@ -58,7 +77,15 @@ func (p *Paddle) Draw(pixels []byte) {
 }
 
 func (p *Paddle) Update(evt KeyboardEvent) {
+	if evt.Key == ArrowUp {
+		p.pos.y -= 20
+	} else if evt.Key == ArrowDown {
+		p.pos.y += 20
+	}
+}
 
+func (p *Paddle) AutoUpdate(b *Ball) {
+	p.pos.y = b.pos.y
 }
 
 func NewPaddle(p Position, s Size, c Color) *Paddle {
@@ -102,7 +129,7 @@ func NewSize(w, h int) Size {
 
 func setPixels(x, y int, c Color, pixels []byte) {
 	pos := (y*Width + x) * 4
-	if pos < len(pixels)-4 {
+	if pos < len(pixels)-4 && pos >= 0 {
 		pixels[pos] = c.r
 		pixels[pos+1] = c.g
 		pixels[pos+2] = c.b
