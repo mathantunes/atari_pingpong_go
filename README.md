@@ -24,9 +24,9 @@ go run ./app/pingpong/main.go
 
 ### Entities
 
-A **paddle** is what the player controls through the keyboard
+A **Paddle** is what the player controls through the keyboard
 
-A **ball** is the moving part between the players
+A **Ball** is the moving part between the players
 
 ### Value Objects
 
@@ -34,6 +34,14 @@ A **Keyboard Event** represents a new state the player wants to set to paddle
 
 ### Infra Layer
 
-A **Dispatcher** is responsible for reading *SDL* keyboard events and calling all KeyBoardListener subscribed to the dispatcher
+A **EventDispatcher** is responsible for reading *SDL* keyboard events and calling all KeyBoardListener subscribed to the dispatcher
+A **EventPooler** is responsible for pooling *SDL* events and calling the respective dispatcher
 
+## TODOS:
 
+* Frame Rate Independence
+* Score
+* Game Over State -> Win/Lose
+* Multiplayer
+* AI more imperfect
+* Window resize
