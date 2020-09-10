@@ -15,3 +15,11 @@ type Updatable interface {
 type KeyBoardListener interface {
 	Update(KeyboardEvent)
 }
+
+type AutomaticPlayer interface {
+	AutoUpdate(*Ball)
+}
+
+type Bouncer interface {
+	Bounce(*Paddle, *Paddle)
+}
