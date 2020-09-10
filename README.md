@@ -32,6 +32,10 @@ A **Ball** is the moving part between the players
 
 A **Keyboard Event** represents a new state the player wants to set to paddle
 
+### Service
+
+A **G** structure inside *game* package is responsible for holding all game logic. It abstracts the calls to Update and Draw by utilizing the interfaces defined for entities
+
 ### Infra Layer
 
 A **EventDispatcher** is responsible for reading *SDL* keyboard events and calling all KeyBoardListener subscribed to the dispatcher
