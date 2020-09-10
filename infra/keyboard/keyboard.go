@@ -2,8 +2,28 @@ package keyboard
 
 import (
 	"github.com/mathantunes/atari_pingpong_go/domain"
+	"github.com/mathantunes/atari_pingpong_go/infra"
 	"github.com/veandco/go-sdl2/sdl"
 )
+
+type SDLEventPooler struct {
+	Dispatcher infra.KeyboardDispatcher
+}
+
+func NewSDLEventPooler(dispatcher infra.KeyboardDispatcher) *SDLEventPooler {
+	return &SDLEventPooler{dispatcher}
+}
+
+func (s *SDLEventPooler) Pool() {
+	for evt := sdl.PollEvent(); evt != nil; evt = sdl.PollEvent() {
+		switch t := evt.(type) {
+		case *sdl.QuitEvent:
+			return
+		case *sdl.KeyboardEvent:
+			s.Dispatcher.Dispatch(t)
+		}
+	}
+}
 
 type EventDispatcher struct {
 	sub []domain.KeyBoardListener
