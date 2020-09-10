@@ -5,8 +5,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/mathantunes/atari_pingpong_go/domain"
-	"github.com/mathantunes/atari_pingpong_go/infra/keyboard"
+	"github.com/mathantunes/atari_pingpong_go/domain/game"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -49,54 +48,13 @@ func main() {
 	defer tex.Destroy()
 
 	pixels := make([]byte, Width*Height*4)
-
-	p1 := domain.NewPaddle(
-		domain.NewPosition(50, 100),
-		domain.NewSize(20, 100),
-		domain.White,
-	)
-	p2 := domain.NewPaddle(
-		domain.NewPosition(750, 100),
-		domain.NewSize(20, 100),
-		domain.White,
-	)
-	ball := domain.NewBall(
-		domain.NewPosition(300, 300),
-		20,
-		domain.White,
-		domain.NewVelocity(4, 4),
-	)
-
-	kbdDispatcher := keyboard.NewEventDispatcher()
-	kbdDispatcher.AddListener(p1)
-
+	g := game.New(pixels, Width, Height)
+	g.Init()
 	for {
-		for evt := sdl.PollEvent(); evt != nil; evt = sdl.PollEvent() {
-			switch t := evt.(type) {
-			case *sdl.QuitEvent:
-				return
-			case *sdl.KeyboardEvent:
-				kbdDispatcher.Dispatch(t)
-			}
-		}
-		clear(pixels)
-		p1.Draw(pixels)
-		p2.AutoUpdate(ball)
-		p2.Draw(pixels)
-
-		ball.Update()
-		ball.Bounce(p1, p2)
-		ball.Draw(pixels)
-
+		g.GameLoop()
 		tex.Update(nil, pixels, Width*4)
 		renderer.Copy(tex, nil, nil)
 		renderer.Present()
 		sdl.Delay(Delay)
-	}
-}
-
-func clear(pixels []byte) {
-	for i := range pixels {
-		pixels[i] = 0
 	}
 }
