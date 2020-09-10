@@ -51,7 +51,12 @@ func main() {
 	pixels := make([]byte, Width*Height*4)
 
 	p1 := domain.NewPaddle(
-		domain.NewPosition(100, 100),
+		domain.NewPosition(50, 100),
+		domain.NewSize(20, 100),
+		domain.White,
+	)
+	p2 := domain.NewPaddle(
+		domain.NewPosition(750, 100),
 		domain.NewSize(20, 100),
 		domain.White,
 	)
@@ -59,7 +64,7 @@ func main() {
 		domain.NewPosition(300, 300),
 		20,
 		domain.White,
-		domain.NewVelocity(1, 1),
+		domain.NewVelocity(4, 4),
 	)
 
 	kbdDispatcher := keyboard.NewEventDispatcher()
@@ -73,13 +78,25 @@ func main() {
 			case *sdl.KeyboardEvent:
 				kbdDispatcher.Dispatch(t)
 			}
-			p1.Draw(pixels)
-			ball.Draw(pixels)
-			ball.Update()
-			tex.Update(nil, pixels, Width*4)
-			renderer.Copy(tex, nil, nil)
-			renderer.Present()
-			sdl.Delay(Delay)
 		}
+		clear(pixels)
+		p1.Draw(pixels)
+		p2.AutoUpdate(ball)
+		p2.Draw(pixels)
+
+		ball.Update()
+		ball.Bounce(p1, p2)
+		ball.Draw(pixels)
+
+		tex.Update(nil, pixels, Width*4)
+		renderer.Copy(tex, nil, nil)
+		renderer.Present()
+		sdl.Delay(Delay)
+	}
+}
+
+func clear(pixels []byte) {
+	for i := range pixels {
+		pixels[i] = 0
 	}
 }
