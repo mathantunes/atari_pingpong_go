@@ -19,6 +19,21 @@ func (e *EventDispatcher) AddListener(l domain.KeyBoardListener) {
 
 func (e *EventDispatcher) Dispatch(evt *sdl.KeyboardEvent) {
 	for idx := range e.sub {
-		e.sub[idx].Update(domain.KeyboardEvent{})
+		e.sub[idx].Update(domain.KeyboardEvent{
+			Key:     toKey(evt),
+			Keydown: evt.State,
+		})
+	}
+}
+
+func toKey(evt *sdl.KeyboardEvent) domain.Key {
+	println("cuirrent key", evt.Keysym.Sym, sdl.SCANCODE_UP)
+	switch evt.Keysym.Sym {
+	case sdl.K_UP:
+		return domain.ArrowUp
+	case sdl.K_DOWN:
+		return domain.ArrowDown
+	default:
+		return domain.Key(999)
 	}
 }
