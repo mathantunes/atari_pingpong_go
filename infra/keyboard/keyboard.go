@@ -54,6 +54,8 @@ func toKey(evt *sdl.KeyboardEvent) domain.Key {
 		return domain.ArrowUp
 	case sdl.K_DOWN:
 		return domain.ArrowDown
+	case sdl.K_SPACE:
+		return domain.Space
 	default:
 		return domain.Key(999)
 	}
