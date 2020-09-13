@@ -6,6 +6,7 @@ type Ball struct {
 	radius float32
 	vel    Velocity
 	color  Color
+	delta  float32
 }
 
 // Draw ball
@@ -20,10 +21,15 @@ func (b *Ball) Draw(pixels []byte) {
 	}
 }
 
+// SetDelta stores frame rate delta on ball instance
+func (b *Ball) SetDelta(delta float32) {
+	b.delta = delta
+}
+
 // Update ball position and velocity
 func (b *Ball) Update() {
-	b.pos.x += b.vel.x
-	b.pos.y += b.vel.y
+	b.pos.x += b.vel.x * b.delta
+	b.pos.y += b.vel.y * b.delta
 	b.tryBounceOffLimits()
 }
 
@@ -48,8 +54,8 @@ func (b *Ball) tryBounceOffLimits() {
 		b.vel.y *= -1
 	}
 	if b.pos.x-fRadius < 0 || b.pos.x+fRadius > 800 {
-		b.pos.x = 300
-		b.pos.y = 300
+		b.pos.x = Width / 2
+		b.pos.y = Height / 2
 	}
 }
 
@@ -65,9 +71,16 @@ func NewBall(p Position, r float32, c Color, v Velocity) *Ball {
 
 // Paddle Represents the players paddle
 type Paddle struct {
-	pos   Position
-	size  Size
-	color Color
+	pos    Position
+	size   Size
+	color  Color
+	delta  float32
+	ySpeed float32
+}
+
+// SetDelta stores frame rate delta on paddle instance
+func (p *Paddle) SetDelta(delta float32) {
+	p.delta = delta
 }
 
 // Draw implementation of Drawable for Paddle
@@ -83,9 +96,9 @@ func (p *Paddle) Draw(pixels []byte) {
 // Update paddle position
 func (p *Paddle) Update(evt KeyboardEvent) {
 	if evt.Key == ArrowUp && evt.Keydown > 0 {
-		p.pos.y -= 20
+		p.pos.y -= p.ySpeed * p.delta
 	} else if evt.Key == ArrowDown && evt.Keydown > 0 {
-		p.pos.y += 20
+		p.pos.y += p.ySpeed * p.delta
 	}
 }
 
@@ -93,19 +106,20 @@ func (p *Paddle) Update(evt KeyboardEvent) {
 func (p *Paddle) AutoUpdate(b *Ball) {
 	// p.pos.y = b.pos.y
 	if p.pos.y > b.pos.y {
-		p.pos.y -= 20
+		p.pos.y -= p.ySpeed * p.delta
 	}
 	if p.pos.y < b.pos.y {
-		p.pos.y += 20
+		p.pos.y += p.ySpeed * p.delta
 	}
 }
 
 // NewPaddle Initialize paddle
-func NewPaddle(p Position, s Size, c Color) *Paddle {
+func NewPaddle(p Position, s Size, c Color, ySpeed float32) *Paddle {
 	return &Paddle{
-		pos:   p,
-		size:  s,
-		color: c,
+		pos:    p,
+		size:   s,
+		color:  c,
+		ySpeed: ySpeed,
 	}
 }
 

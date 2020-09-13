@@ -14,6 +14,8 @@ type G struct {
 	Pooler      infra.EventPooler
 }
 
+var aiCounter = 0
+
 func New(pixels []byte, width, height int) *G {
 	return &G{Pixels: pixels}
 }
@@ -22,17 +24,19 @@ func (g *G) Init() {
 		domain.NewPosition(50, 100),
 		domain.NewSize(20, 100),
 		domain.White,
+		2000000,
 	)
 	g.PaddleRight = domain.NewPaddle(
 		domain.NewPosition(750, 100),
 		domain.NewSize(20, 100),
 		domain.White,
+		2000000,
 	)
 	g.Ball = domain.NewBall(
 		domain.NewPosition(300, 300),
 		20,
 		domain.White,
-		domain.NewVelocity(4, 4),
+		domain.NewVelocity(300000, 300000),
 	)
 
 	kbdDispatcher := keyboard.NewEventDispatcher()
@@ -40,15 +44,26 @@ func (g *G) Init() {
 	g.Pooler = keyboard.NewSDLEventPooler(kbdDispatcher)
 }
 
-func (g *G) GameLoop() {
+func (g *G) UpdateGame(delta float32) {
 	Clear(g.Pixels)
+	FrameRateCorrects(delta, g.Ball, g.PaddleLeft, g.PaddleRight)
 	Pools(g.Pooler)
-	AIUpdates(g.Ball, g.PaddleRight)
-	Updates(g.Ball)
+
+	if aiCounter > 2 {
+		AIUpdates(g.Ball, g.PaddleRight)
+		aiCounter = 0
+	}
+	aiCounter++
+	Updates(delta, g.Ball)
 	Bounces(g.PaddleLeft, g.PaddleRight, g.Ball)
 	Draws(g.Pixels, g.PaddleLeft, g.Ball, g.PaddleRight)
 }
 
+func FrameRateCorrects(delta float32, frcs ...domain.FrameRateCorrect) {
+	for _, frc := range frcs {
+		frc.SetDelta(delta)
+	}
+}
 func Pools(ps ...infra.EventPooler) {
 	for _, p := range ps {
 		p.Pool()
@@ -61,7 +76,7 @@ func Draws(pxls []byte, drws ...domain.Drawable) {
 	}
 }
 
-func Updates(ups ...domain.Updatable) {
+func Updates(delta float32, ups ...domain.Updatable) {
 	for _, u := range ups {
 		u.Update()
 	}
