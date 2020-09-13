@@ -45,7 +45,7 @@ A **EventPooler** is responsible for pooling *SDL* events and calling the respec
 ## TODOS:
 
 * ✔ Frame Rate Independence
-* Score
+* ✔ Score
 * Game Over State -> Win/Lose
 * Multiplayer
 * AI more imperfect
