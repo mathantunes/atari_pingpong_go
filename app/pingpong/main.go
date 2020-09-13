@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/mathantunes/atari_pingpong_go/domain/game"
+	"github.com/mathantunes/atari_pingpong_go/infra/image"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -45,6 +46,13 @@ func main() {
 	}
 	defer tex.Destroy()
 
+	gameOverTex := image.LoadGraphic("D:/Coding/OpenSource/atari_pingpong_go/app/pingpong/assets/gameover.bmp", renderer)
+	defer gameOverTex.Destroy()
+	_, _, w, h, err := gameOverTex.Query()
+	if err != nil {
+		fmt.Println("gameOverTex Query error: ", err)
+		return
+	}
 	pixels := make([]byte, Width*Height*4)
 	g := game.New(pixels, Width, Height)
 	g.Init()
@@ -54,8 +62,12 @@ func main() {
 	for {
 		frameStart := time.Now()
 		g.RunFrame(frameDur)
-		tex.Update(nil, pixels, Width*4)
-		renderer.Copy(tex, nil, nil)
+		if st := g.GetStatus(); st == game.GameOver {
+			renderer.Copy(gameOverTex, &sdl.Rect{0, 0, w, h}, &sdl.Rect{Width/2 - w/2, Height/2 - h/2, w / 2, h / 2})
+		} else {
+			tex.Update(nil, pixels, Width*4)
+			renderer.Copy(tex, nil, nil)
+		}
 		renderer.Present()
 		frameDur = float32(time.Since(frameStart).Seconds()) / 1000
 		if frameDur < 0.005 {
