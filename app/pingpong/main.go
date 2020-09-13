@@ -53,7 +53,7 @@ func main() {
 	var frameDur float32 = 0
 	for {
 		frameStart := time.Now()
-		g.UpdateGame(frameDur)
+		g.RunFrame(frameDur)
 		tex.Update(nil, pixels, Width*4)
 		renderer.Copy(tex, nil, nil)
 		renderer.Present()
