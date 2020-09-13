@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mathantunes/atari_pingpong_go/domain/game"
 	"github.com/veandco/go-sdl2/sdl"
@@ -31,15 +32,12 @@ func main() {
 		return
 	}
 	defer window.Destroy()
-
 	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
 	if err != nil {
 		fmt.Println("Error Create Renderer: ", err)
 		return
 	}
-
 	defer renderer.Destroy()
-
 	tex, err := renderer.CreateTexture(sdl.PIXELFORMAT_ABGR8888, sdl.TEXTUREACCESS_STREAMING, Width, Height)
 	if err != nil {
 		fmt.Println("Error Create Texture: ", err)
@@ -50,11 +48,19 @@ func main() {
 	pixels := make([]byte, Width*Height*4)
 	g := game.New(pixels, Width, Height)
 	g.Init()
+	var Maxfps uint32 = 200
+	var delay uint32 = 1000 / Maxfps
+	var frameDur float32 = 0
 	for {
-		g.GameLoop()
+		frameStart := time.Now()
+		g.UpdateGame(frameDur)
 		tex.Update(nil, pixels, Width*4)
 		renderer.Copy(tex, nil, nil)
 		renderer.Present()
-		sdl.Delay(Delay)
+		frameDur = float32(time.Since(frameStart).Seconds()) / 1000
+		if frameDur < 0.005 {
+			sdl.Delay(delay)
+			frameDur = float32(time.Since(frameStart).Seconds()) / 1000
+		}
 	}
 }
