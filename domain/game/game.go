@@ -82,7 +82,7 @@ func (g *G) prepare(delta float32) {
 }
 
 func (g *G) UpdateFrame(delta float32) {
-	if aiCounter > 4 {
+	if aiCounter > 10 {
 		AIUpdates(g.Ball, g.PaddleRight)
 		aiCounter = 0
 	}
