@@ -1,6 +1,8 @@
 package keyboard
 
 import (
+	"os"
+
 	"github.com/mathantunes/atari_pingpong_go/domain"
 	"github.com/mathantunes/atari_pingpong_go/infra"
 	"github.com/veandco/go-sdl2/sdl"
@@ -18,7 +20,7 @@ func (s *SDLEventPooler) Pool() {
 	for evt := sdl.PollEvent(); evt != nil; evt = sdl.PollEvent() {
 		switch t := evt.(type) {
 		case *sdl.QuitEvent:
-			return
+			os.Exit(0)
 		case *sdl.KeyboardEvent:
 			s.Dispatcher.Dispatch(t)
 		}
