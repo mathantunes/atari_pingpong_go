@@ -38,12 +38,13 @@ A **G** structure inside *game* package is responsible for holding all game logi
 
 ### Infra Layer
 
-A **EventDispatcher** is responsible for reading *SDL* keyboard events and calling all KeyBoardListener subscribed to the dispatcher
+A **EventDispatcher** is responsible for reading *SDL* keyboard events and calling all KeyBoardListener subscribed to the dispatcher.
+
 A **EventPooler** is responsible for pooling *SDL* events and calling the respective dispatcher
 
 ## TODOS:
 
-* Frame Rate Independence
+* ✔ Frame Rate Independence
 * Score
 * Game Over State -> Win/Lose
 * Multiplayer
