@@ -23,3 +23,7 @@ type AutomaticPlayer interface {
 type Bouncer interface {
 	Bounce(*Paddle, *Paddle)
 }
+
+type FrameRateCorrect interface {
+	SetDelta(float32)
+}
