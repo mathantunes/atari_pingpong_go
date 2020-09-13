@@ -46,7 +46,7 @@ func main() {
 	}
 	defer tex.Destroy()
 
-	gameOverTex := image.LoadGraphic("D:/Coding/OpenSource/atari_pingpong_go/app/pingpong/assets/gameover.bmp", renderer)
+	gameOverTex := image.LoadGraphic("./assets/gameover.bmp", renderer)
 	defer gameOverTex.Destroy()
 	_, _, w, h, err := gameOverTex.Query()
 	if err != nil {
