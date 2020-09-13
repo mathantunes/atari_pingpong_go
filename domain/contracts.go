@@ -24,6 +24,15 @@ type Bouncer interface {
 	Bounce(*Paddle, *Paddle)
 }
 
+type ScoreDispatcher interface {
+	Dispatch(ScoreEvent)
+	AddListener(ScoreListener)
+}
+
+type ScoreListener interface {
+	OnScore(ScoreEvent)
+}
+
 type FrameRateCorrect interface {
 	SetDelta(float32)
 }

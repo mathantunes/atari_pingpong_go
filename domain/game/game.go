@@ -12,7 +12,16 @@ type G struct {
 	PaddleRight *domain.Paddle
 	Ball        *domain.Ball
 	Pooler      infra.EventPooler
+	ScoreBoard  *domain.ScoreBoard
+	Status      status
 }
+
+type status int
+
+const (
+	start status = iota
+	playing
+)
 
 var aiCounter = 0
 
@@ -21,13 +30,13 @@ func New(pixels []byte, width, height int) *G {
 }
 func (g *G) Init() {
 	g.PaddleLeft = domain.NewPaddle(
-		domain.NewPosition(50, 100),
+		domain.NewPosition(50, 300),
 		domain.NewSize(20, 100),
 		domain.White,
 		2000000,
 	)
 	g.PaddleRight = domain.NewPaddle(
-		domain.NewPosition(750, 100),
+		domain.NewPosition(750, 300),
 		domain.NewSize(20, 100),
 		domain.White,
 		2000000,
@@ -38,25 +47,58 @@ func (g *G) Init() {
 		domain.White,
 		domain.NewVelocity(300000, 300000),
 	)
+	g.ScoreBoard = domain.NewScoreBoard(
+		domain.NewPosition(200, 100),
+		domain.NewPosition(600, 100),
+		10,
+		domain.White,
+	)
+	g.Ball.AddListener(g.ScoreBoard)
+	g.Ball.AddListener(g)
 
 	kbdDispatcher := keyboard.NewEventDispatcher()
 	kbdDispatcher.AddListener(g.PaddleLeft)
+	kbdDispatcher.AddListener(g)
 	g.Pooler = keyboard.NewSDLEventPooler(kbdDispatcher)
+	g.Status = start
+	g.UpdateFrame(0)
 }
 
-func (g *G) UpdateGame(delta float32) {
-	Clear(g.Pixels)
-	FrameRateCorrects(delta, g.Ball, g.PaddleLeft, g.PaddleRight)
-	Pools(g.Pooler)
+func (g *G) RunFrame(delta float32) {
+	g.prepare(delta)
+	if g.Status == playing {
+		g.UpdateFrame(delta)
+	}
+}
 
-	if aiCounter > 2 {
+func (g *G) prepare(delta float32) {
+	Pools(g.Pooler)
+	FrameRateCorrects(delta, g.Ball, g.PaddleLeft, g.PaddleRight)
+}
+
+func (g *G) UpdateFrame(delta float32) {
+	if aiCounter > 4 {
 		AIUpdates(g.Ball, g.PaddleRight)
 		aiCounter = 0
 	}
 	aiCounter++
+	Clear(g.Pixels)
 	Updates(delta, g.Ball)
 	Bounces(g.PaddleLeft, g.PaddleRight, g.Ball)
-	Draws(g.Pixels, g.PaddleLeft, g.Ball, g.PaddleRight)
+	Draws(g.Pixels, g.PaddleLeft, g.Ball, g.PaddleRight, g.ScoreBoard)
+}
+func (g *G) OnScore(evt domain.ScoreEvent) {
+	g.Status = start
+	l, r, m := g.ScoreBoard.GetScore()
+	if l > m || r > m {
+		g.ScoreBoard.Reset()
+		g.UpdateFrame(0)
+	}
+}
+func (g *G) Update(evt domain.KeyboardEvent) {
+	if evt.Key == domain.Space && evt.Keydown > 0 {
+		g.Status = playing
+	}
 }
 
 func FrameRateCorrects(delta float32, frcs ...domain.FrameRateCorrect) {
