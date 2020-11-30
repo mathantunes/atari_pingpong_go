@@ -1,7 +1,7 @@
 package domain
 
 type GameLoop interface {
-	GameLoop()
+	RunFrame(delta float32)
 }
 
 type Drawable interface {
